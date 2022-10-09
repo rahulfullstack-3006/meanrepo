@@ -1,4 +1,5 @@
 const Sequelize=require('sequelize');
+const { sequelize } = require('../database/db');
 const db=require('../database/db');
 
 
@@ -10,17 +11,17 @@ module.exports=db.sequelize.define(
             primaryKey:true,
             autoIncrement:true
         },
-        firstName:{
-            type:Sequelize.STRING
-        },
-        lastName:{
-            type:Sequelize.STRING
+        username:{
+            type:Sequelize.STRING(30)
         },
         email:{
-            type:Sequelize.STRING
+            type:Sequelize.STRING(30)
         },
         password:{
-            type:Sequelize.STRING
+            type:Sequelize.STRING(10)
+        },
+        mobile:{
+            type:Sequelize.STRING(12)
         },
         created:{
             type:Sequelize.DATE,
@@ -28,8 +29,14 @@ module.exports=db.sequelize.define(
         }
     },
     {
-        timestamps:false
+        timestamps:true
     }
 )
+
+sequelize.sync({ force: false }).then(function () {
+    console.log('employee table created');``
+  }).catch(function (err) {
+    console.error('Error while creating employee table', err);
+});
 
 
