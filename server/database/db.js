@@ -18,6 +18,7 @@ const sequelize=new Sequelize('employee_details','appuser','12345678',{
 db.sequelize=sequelize;
 db.Sequelize=Sequelize;
 
+
 sequelize
     .authenticate()
     .then(() => {

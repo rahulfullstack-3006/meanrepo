@@ -14,14 +14,17 @@ module.exports=db.sequelize.define(
         username:{
             type:Sequelize.STRING(30)
         },
-        email:{
+        age:{
+            type:Sequelize.STRING(30)
+        },
+        standard:{
             type:Sequelize.STRING(30)
         },
         password:{
-            type:Sequelize.STRING(10)
+            type:Sequelize.STRING(255)
         },
-        mobile:{
-            type:Sequelize.STRING(12)
+        token:{
+            type:Sequelize.STRING(1000)
         },
         created:{
             type:Sequelize.DATE,
@@ -34,7 +37,7 @@ module.exports=db.sequelize.define(
 )
 
 sequelize.sync({ force: false }).then(function () {
-    console.log('employee table created');``
+    console.log('employee table created');
   }).catch(function (err) {
     console.error('Error while creating employee table', err);
 });
