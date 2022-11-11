@@ -8,7 +8,9 @@ var User=require('../models/User');
 var jwt = require('jsonwebtoken');
 var db=require('../database/db');
 const bcrypt = require('bcrypt');
+const e = require('express');
 const saltRounds = 10;
+const sequelize=require('../database/db')
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -115,16 +117,15 @@ console.log("result",result);
       expiresIn:1440
     })
 
-    User.update(
+    User.update(                              //we are not storing token in register API that's why in login we are updating
       { token:token },
       { where: { id: user.id } }
     )
       .then(result => {
-       // handleResult(result)
        console.log("result token",result);
   })
       .catch(err =>{
-      //  handleError(err)
+      console.log("err",err);
   })
     res.json({status:true,message:'User login successfully',token:token})
   }else{
@@ -140,7 +141,13 @@ console.log("result",result);
 
  //get data from db for highchart
  router.get('/getAllData',(req,res,next)=>{
-  User.findAll()
+  User.findAll({
+    attributes: [
+      "age",
+      [db.sequelize.fn("COUNT", db.sequelize.col("age")), "count_isActive"],
+    ],
+    group: "age",
+  })
   .then(result=>{
     console.log("result",result);
   res.send({data:result,message:'get all data successfully',status:200})
@@ -152,6 +159,54 @@ console.log("result",result);
 
 })  
 
+
+router.get('/getDataById/:age',(req,res)=>{
+  let dropDownId=req.params.age;
+  console.log("dropDownId",dropDownId);
+  User.findAll({
+    attributes: [
+      "age",
+      [db.sequelize.fn("COUNT", db.sequelize.col("age")), "count_isActive"],
+    ],
+    where:{age:dropDownId },
+    group: db.sequelize.col("age")
+  })
+  .then(user=>{
+    console.log("ussssssssser",user);
+   if(user !== null){
+    res.json({status:true,message:'Data received successfully',data:user})
+   }else{
+    res.json({status:false,message:'No Data received',data:[]})
+   }
+  })
+  .catch(err=>{
+    res.send('err',+err)
+  })
+})
+
+
+// router.post('/getDataById',(req,res)=>{
+//   let idAge=req.body.age;
+//   console.log("ageeee",age);
+//   User.findOne({
+//     where:{
+//       age:idAge
+//     }
+//   })
+//   .then(user=>{
+//     console.log("user",user);
+//     // if(user !== null){
+//     //   res.json({status:true,message:'Data received successfully',data:user})
+//     // }
+//     // else{
+//     //   res.json({status:false,message:'No Data received',data:[]})
+//     // }
+//     res.json({status:true,message:'Data received successfully',data:user})
+//   })
+//   // .catch(err=>{
+//   //   res.send('err',+err)
+//   // })
+// })
 
 
 
@@ -207,7 +262,7 @@ console.log("result",result);
 router.get('/get_by_id/:id',(req,res,next)=>{
   let userId=req.params.id;
   
-  User.findOne({
+  User.findAll({
     where:{
       id:userId
     }
