@@ -9,6 +9,7 @@ import { RegisterComponent } from './components/register/register.component';
 import {HttpClientModule} from '@angular/common/http';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { HighchartsChartModule } from 'highcharts-angular';
+// import { HighchartsChartComponent } from 'highcharts-angular';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { HighchartsChartModule } from 'highcharts-angular';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
+    // HighchartsChartComponent
     HighchartsChartModule
   ],
   providers: [],

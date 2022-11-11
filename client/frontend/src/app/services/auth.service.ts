@@ -22,4 +22,8 @@ export class AuthService {
   getAllData():Observable<any>{
   return this.http.get(`${this.baseUrl}/getAllData`)
   }
+
+  getDataById(id:any){
+    return this.http.get(`${this.baseUrl}/getDataById/`+id)
+  }
 }
