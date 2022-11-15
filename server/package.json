@@ -19,7 +19,10 @@
     "morgan": "~1.9.1",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
+    "node-cache-redis": "^6.4.2",
     "nodemon": "^2.0.20",
+    "redis": "^4.5.0",
+    "redis-commander": "^0.8.0",
     "sequelize": "^6.24.0"
   }
 }

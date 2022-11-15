@@ -8,9 +8,16 @@ var User=require('../models/User');
 var jwt = require('jsonwebtoken');
 var db=require('../database/db');
 const bcrypt = require('bcrypt');
-const e = require('express');
+// const e = require('express');
 const saltRounds = 10;
-const sequelize=require('../database/db')
+const sequelize=require('../database/db');
+
+const redis=require('redis');
+const redisClient=redis.createClient(6379,'127.0.0.1');
+redisClient.connect();
+redisClient.on("connect",function(err){
+  console.log('Connected Redis');
+})
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -140,26 +147,35 @@ console.log("result",result);
 
 
  //get data from db for highchart
- router.get('/getAllData',(req,res,next)=>{
-  User.findAll({
-    attributes: [
-      "age",
-      [db.sequelize.fn("COUNT", db.sequelize.col("age")), "count_isActive"],
-    ],
-    group: "age",
-  })
-  .then(result=>{
-    console.log("result",result);
-  res.send({data:result,message:'get all data successfully',status:200})
-
-  })
-  .catch(err=>{
-    console.log(err);
-  })
+ router.get('/getAllData',async (req,res,next)=>{
+  let keyName='normalKey';
+  let getCacheData=await redisClient.get(keyName);
+  if(getCacheData) {
+    res.send({data:JSON.parse(getCacheData),message:'get all data successfully',status:200})
+  }else {
+    User.findAll({
+      attributes: [
+        "age",
+        [db.sequelize.fn("COUNT", db.sequelize.col("age")), "count_isActive"],
+      ],
+      group: "age",
+    })
+    .then(async(result)=>{
+      await redisClient.set(keyName,JSON.stringify(result),{EX:30,NX: true});
+      res.send({data:result,message:'get all data successfully',status:200})
+    })
+    .catch(err=>{
+     console.log("err",err);
+    })
+  }
+ 
+  //res.send({data:result,message:'get all data successfully',status:200})
 
 })  
 
 
+ 
+//getDataById/:age thru sequelize only
 router.get('/getDataById/:age',(req,res)=>{
   let dropDownId=req.params.age;
   console.log("dropDownId",dropDownId);
@@ -183,6 +199,42 @@ router.get('/getDataById/:age',(req,res)=>{
     res.send('err',+err)
   })
 })
+
+
+//getDataById/:age thru redis
+// router.get('/getDataById/:age',async (req,res)=>{
+//   let dropDownId=req.params.age;
+//   console.log("dropDownId",dropDownId);
+//   let keyName1="dropdownkey";
+//   let getCacheData1=await redisClient.get(keyName1);
+//   if(getCacheData1){
+//     res.json({status:true,message:'Data received successfully',data:JSON.parse(getCacheData1)})
+
+//   }else{
+//     User.findAll({
+//       attributes: [
+//         "age",
+//         [db.sequelize.fn("COUNT", db.sequelize.col("age")), "count_isActive"],
+//       ],
+//       where:{age:dropDownId },
+//       group: db.sequelize.col("age")
+//     })
+//     .then(async (user)=>{
+//       console.log("ussssssssser",user);
+//      if(user !== null){
+//      await redisClient.set(keyName1,JSON.stringify(user))
+//       res.json({status:true,message:'Data received successfully',data:user})
+  
+//      }else{
+//       res.json({status:false,message:'No Data received',data:[]})
+//      }
+//     })
+//     .catch(err=>{
+//       res.send('err',+err)
+//     })
+//   }
+
+// })
 
 
 // router.post('/getDataById',(req,res)=>{
