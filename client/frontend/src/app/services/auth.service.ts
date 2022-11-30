@@ -26,4 +26,12 @@ export class AuthService {
   getDataById(id:any){
     return this.http.get(`${this.baseUrl}/getDataById/`+id)
   }
+
+  uploadFile(file:any){
+    return this.http.post(`${this.baseUrl}/upload`,file)
+  }
+
+  uploadMultipleFile(files:any){
+    return this.http.post(`${this.baseUrl}/multipleFileUpload`,files)
+  }
 }

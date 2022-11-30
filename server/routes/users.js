@@ -8,21 +8,124 @@ var User=require('../models/User');
 var jwt = require('jsonwebtoken');
 var db=require('../database/db');
 const bcrypt = require('bcrypt');
-// const e = require('express');
+const multer  = require('multer')
 const saltRounds = 10;
 const sequelize=require('../database/db');
+const fs=require('fs');
 
 const redis=require('redis');
+const app = require('../app');
 const redisClient=redis.createClient(6379,'127.0.0.1');
 redisClient.connect();
 redisClient.on("connect",function(err){
   console.log('Connected Redis');
 })
 
+/*************** Multer  ****************/
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads')
+  },
+  filename: function (req, file, cb) {
+    // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    // cb(null, file.fieldname + '-' + uniqueSuffix)
+    cb(null, `images_${file.originalname}`)
+
+  }
+})
+
+const upload = multer({
+   storage: storage,
+   limits:{fileSize:1000000},
+   fileFilter(req, file, cb) {
+    if(!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+    return cb( new Error('Please upload a valid image file'))
+    }
+    cb(undefined, true);
+    // cb('Give proper files format to upload');
+    }
+   });
+// const upload=multer({
+//   storage:storage,
+//   limits:{fileSize:1000000},
+//   fileFilter:(req,file,cb)=>{
+//     const fileTypes=/jpeg|jpg|png|gif/;
+//     const mimeType=fileTypes.match(file.mimetype);
+//     // const extname=fileTypes.test(path.extname(file.originalname));
+
+//     if(mimeType){
+//       return cb(null,true)
+//     }
+//     cb('Give proper files format to upload');
+//   }
+// })
+
+
+router.post('/upload',upload.single('file'),(req,res)=>{
+  const file=req.file;
+  // const readFile=fs.readFile(file.path);
+  // console.log("readFile",readFile);
+  console.log("fileeeee",file);
+  console.log("file.filename",file.filename);
+  // console.log("req.file.buffer.toString('base64')",req.file.path.toString('base64'));
+  if(req.file){
+    // db.sequelize.addColumn('users', 'image', { type: DataTypes.STRING });
+    User.create({
+      image:req.file.filename
+    })
+    .then(data=>{
+      console.log("data in single file",data);
+      res.json({message:'File upload successfully',fileData:JSON.stringify(data)});
+    })
+    .catch(err=>{
+      res.json({message:'No file upload'})                    //not able to handle format error
+    })
+  }
+
+  
+  })
+
+// router.post('/upload',upload.single('file'),(req,res)=>{
+//   const file=req.file;
+//   console.log("file.filename",file.filename);
+//   if(!file){
+//    const error=new Error('Please upload file');
+//    error.httpStatusCode=400
+//    return next(error)
+//   }
+//   User.create(file)
+//   .then(data=>{
+//     res.json({message:'File upload successfully',fileData:JSON.stringify(data)});
+//     // res.send(file);
+//   })
+//   .catch(err=>{
+//     res.json({message:'No file upload'})
+//   })
+  
+//   })
+
+
+  router.post('/multipleFileUpload',upload.array('multipleFiles'),(req,res)=>{
+    const files=req.files;
+    console.log("req.files",req.files);
+    console.log("files for multiple upload",files);
+    if(files){
+      res.send(files);
+    }else{
+      res.json({message:'No file upload'})
+    }
+    })
+  
+
+    /*************** Multer  ****************/
+
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
+
+
+
 
 //Using bcyrpt
 // router.post('/register', async function(req, res, next) {
@@ -143,6 +246,8 @@ console.log("result",result);
    res.json('No such User')
   }   
    });
+
+
 
 
 

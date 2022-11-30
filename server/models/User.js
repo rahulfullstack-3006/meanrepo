@@ -26,6 +26,9 @@ module.exports=db.sequelize.define(
         token:{
             type:Sequelize.STRING(1000)
         },
+        // image:{
+        //     type:Sequelize.STRING(1000)
+        // },
         created:{
             type:Sequelize.DATE,
             defaultValue:Sequelize.NOW
@@ -38,6 +41,7 @@ module.exports=db.sequelize.define(
 
 sequelize.sync({ force: false }).then(function () {
     console.log('employee table created');
+    // sequelize.addColumn('users', 'image', { type: Sequelize.STRING });
   }).catch(function (err) {
     console.error('Error while creating employee table', err);
 });

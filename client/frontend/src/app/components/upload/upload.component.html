@@ -1,0 +1,29 @@
+
+<div class="container">
+    <div class="row">
+        <div style="text-align:center">
+            <form>
+              <div>
+                <input type="file" name="image"    (change)="selectImage($event)"/>
+              </div>
+              <br>
+              <div>
+                <button type="submit" (click)="onSubmit()">Upload</button>
+              </div>
+            </form>
+          </div>
+          
+          <h2>Multiple Image</h2>
+          <div style="text-align:center">
+            <form>
+              <div>
+                <input type="file" name="image" multiple   (change)="selectMultipleImage($event)" [(ngModel)]="images"/>
+              </div>
+              <br>
+              <div>
+                <button type="submit" (click)="onMultipleSubmit()">Upload</button>
+              </div>
+            </form>
+          </div>
+    </div>
+</div>

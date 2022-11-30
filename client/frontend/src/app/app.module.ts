@@ -9,6 +9,7 @@ import { RegisterComponent } from './components/register/register.component';
 import {HttpClientModule} from '@angular/common/http';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { HighchartsChartModule } from 'highcharts-angular';
+import { UploadComponent } from './components/upload/upload.component';
 // import { HighchartsChartComponent } from 'highcharts-angular';
 
 @NgModule({
@@ -16,7 +17,8 @@ import { HighchartsChartModule } from 'highcharts-angular';
     AppComponent,
     LoginComponent,
     RegisterComponent,
-    DashboardComponent
+    DashboardComponent,
+    UploadComponent
   ],
   imports: [
     BrowserModule,
